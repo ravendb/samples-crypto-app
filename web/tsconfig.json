@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "module": "es2020",
+    "target": "es2017",
+    "rootDir": ".",
+    "sourceMap": true,
+    "strict": false,
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "lib": ["es2017", "dom"],
+    "skipLibCheck": true
+  }
+}

@@ -1,0 +1,39 @@
+﻿@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.crypto-symbol {
+  @apply text-4xl mt-8;
+}
+
+.crypto-price {
+  @apply text-4xl leading-snug;
+}
+
+.crypto-change {
+  @apply text-sm;
+}
+
+.crypto-change-summary[data-change-type="positive"] {
+  @apply text-green-400;
+}
+
+.crypto-change-summary[data-change-type="negative"] {
+  @apply text-red-400;
+}
+
+.crypto-change strong {
+  @apply font-semibold;
+}
+
+.crypto-timelines {
+  @apply flex bg-gray-800 rounded;
+}
+
+.crypto-timelines > .crypto-timeline-button {
+  @apply flex-auto font-semibold;
+}
+
+.crypto-timelines > .crypto-timeline-button[data-selected] {
+  @apply bg-red-500 rounded text-gray-800 py-1;
+}

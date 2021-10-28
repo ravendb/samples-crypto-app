@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>RavenDB Stocks Demo</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <link type="text/css" rel="stylesheet" href="/odometer.css" />
+    <link type="text/css" rel="stylesheet" href="/site.css" />
+  </head>
+
+  <body class="bg-white dark:bg-gray-900 dark:text-gray-300">
+    <div class="container mx-auto">
+      <main role="main">
+        <div>
+          <h1 id="crypto-symbol" class="crypto-symbol">BTC-USDT</h1>
+          <h2 class="crypto-price">$<span id="crypto-price" class="odometer"></span></h2>
+          <h4 class="crypto-change">
+            <span class="crypto-change-summary"
+              ><span id="crypto-change-price">n/a</span> (<span
+                id="crypto-change-perc"
+              ></span
+              >)</span
+            >
+            <strong id="crypto-change-timespan">Today</strong>
+          </h4>
+
+          <div class="crypto-chart"></div>
+
+          <div class="crypto-timelines">
+            <!-- button class="cypto-timeline-button">Live</button> -->
+            <button
+              data-aggregate-by="OneDay"
+              data-aggregate-by-text="Today"
+              class="crypto-timeline-button"
+            >
+              1D
+            </button>
+            <button
+              data-aggregate-by="OneWeek"
+              data-aggregate-by-text="Past Week"
+              class="crypto-timeline-button"
+            >
+              1W
+            </button>
+            <button
+              data-aggregate-by="OneMonth"
+              data-aggregate-by-text="Past Month"
+              class="crypto-timeline-button"
+            >
+              1M
+            </button>
+            <button
+              data-aggregate-by="ThreeMonths"
+              data-aggregate-by-text="Past 3M"
+              class="crypto-timeline-button"
+            >
+              3M
+            </button>
+            <button
+              data-aggregate-by="OneYear"
+              data-aggregate-by-text="Past Year"
+              class="crypto-timeline-button"
+            >
+              1Y
+            </button>
+            <button
+              data-aggregate-by="FiveYears"
+              data-aggregate-by-text="Past 5 Years"
+              class="crypto-timeline-button"
+            >
+              5Y
+            </button>
+          </div>
+        </div>
+      </main>
+
+      <footer class="my-20">
+        <a class="flex flex-col items-center" href="https://ravendb.net">
+          <span
+            ><img src="/images/ravendb-icon.png" width="80" alt="RavenDB Logo"
+          /></span>
+          <span class="my-5 text-gray-400 uppercase tracking-wider text-xs"
+            >Made with RavenDB</span
+          >
+        </a>
+      </footer>
+    </div>
+
+    <script>
+      window.odometerOptions = {
+        format: "(,ddd).dd",
+        duration: 700,
+      };
+    </script>
+
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/odometer.js/0.4.7/odometer.min.js"
+      integrity="sha512-v3fZyWIk7kh9yGNQZf1SnSjIxjAKsYbg6UQ+B+QxAZqJQLrN3jMjrdNwcxV6tis6S0s1xyVDZrDz9UoRLfRpWw=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
+    <script type="module" src="/index.js"></script>
+  </body>
+</html>

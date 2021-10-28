@@ -1,0 +1,21 @@
+{
+  "folders": [
+    {
+      "path": "web"
+    },
+    {
+      "path": "functions\\backend-node"
+    },
+    {
+      "path": "functions\\backend-dotnet"
+    },
+    {
+      "path": "functions\\ingestion-node"
+    },
+    {
+      "name": "ingestion-dotnet",
+      "path": "functions\\ingestion-dotnet"
+    }
+  ],
+  "settings": {}
+}

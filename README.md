@@ -2,6 +2,8 @@
 
 An end-to-end sample application that showcases Time Series support in RavenDB through a crypto / stock chart inspired by [Robinhood](https://robinhood.com/us/en/) and powered by API data provided by [Kucoin](https://docs.kucoin.com/).
 
+![App architecture diagram](.github/architecture.png)
+
 ## Live Demo
 
 https://ravendb-samples-crypto-app.netlify.com

@@ -1,6 +1,6 @@
 using Raven.Client.Documents.Session.TimeSeries;
 
-namespace Raven.Demos.TimeSeries.Models
+namespace Raven.Demos.CryptoApp.Models
 {
   public struct SymbolPrice
   {

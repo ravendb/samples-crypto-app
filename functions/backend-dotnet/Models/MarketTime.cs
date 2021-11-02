@@ -1,7 +1,7 @@
 using System;
 using NodaTime;
 
-namespace RavenDbStockDemo.Models
+namespace Raven.Demos.CryptoApp.Models
 {
   public class MarketTime
   {

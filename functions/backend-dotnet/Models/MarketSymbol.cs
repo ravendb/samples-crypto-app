@@ -1,5 +1,5 @@
 
-namespace RavenDbStockDemo.Models
+namespace Raven.Demos.CryptoApp.Models
 {
   public class MarketSymbol
   {

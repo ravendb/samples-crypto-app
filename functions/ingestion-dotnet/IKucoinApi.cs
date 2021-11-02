@@ -2,7 +2,7 @@ using System;
 using System.Threading.Tasks;
 using Refit;
 
-namespace Raven.Demos.TimeSeries
+namespace Raven.Demos.CryptoApp
 {
   public interface IKucoinApi
   {

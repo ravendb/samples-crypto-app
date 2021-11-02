@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace RavenDbStockDemo.Models
+namespace Raven.Demos.CryptoApp.Models
 {
 
   [JsonConverter(typeof(JsonStringEnumConverter))]

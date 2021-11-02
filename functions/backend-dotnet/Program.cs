@@ -9,9 +9,9 @@ using Raven.Client.Documents.Session;
 using System.Security.Cryptography.X509Certificates;
 using System.Text.Json;
 using Microsoft.Extensions.DependencyInjection;
-using RavenDbStockDemo.Models;
+using Raven.Demos.CryptoApp.Models;
 
-namespace RavenDbStockDemo
+namespace Raven.Demos.CryptoApp
 {
   public class Program
   {

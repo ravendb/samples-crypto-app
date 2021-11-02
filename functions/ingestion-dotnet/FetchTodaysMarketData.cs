@@ -6,9 +6,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NodaTime;
 using Raven.Client.Documents.Session;
-using Raven.Demos.TimeSeries.Models;
+using Raven.Demos.CryptoApp.Models;
 
-namespace Raven.Demos.TimeSeries
+namespace Raven.Demos.CryptoApp
 {
   public static class FetchTodaysMarketData
   {

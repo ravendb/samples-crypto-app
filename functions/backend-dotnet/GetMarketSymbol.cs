@@ -11,9 +11,9 @@ using Raven.Client.Documents;
 using Raven.Client.Documents.Queries;
 using Raven.Client.Documents.Queries.TimeSeries;
 using Raven.Client.Documents.Session;
-using RavenDbStockDemo.Models;
+using Raven.Demos.CryptoApp.Models;
 
-namespace RavenDbStockDemo
+namespace Raven.Demos.CryptoApp
 {
   public class GetMarketSymbol
   {

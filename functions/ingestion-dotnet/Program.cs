@@ -6,10 +6,10 @@ using Raven.Client.Documents.Session;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using System;
 using System.Security.Cryptography.X509Certificates;
-using Raven.Demos.TimeSeries.Models;
+using Raven.Demos.CryptoApp.Models;
 using Refit;
 
-namespace Raven.Demos.TimeSeries
+namespace Raven.Demos.CryptoApp
 {
   public class Program
   {

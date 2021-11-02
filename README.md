@@ -6,9 +6,9 @@ An end-to-end sample application that showcases Time Series support in RavenDB t
 
 https://ravendb-samples-crypto-app.netlify.com
 
-## Database Export
+## Database Exports
 
-You can download a sample export of the RavenDB database [here](#tbd) that you can import into your own RavenDB instance locally or in [RavenDB Cloud](https://cloud.ravendb.net).
+You can download sample exports of the RavenDB database [here](exports) that you can import into your own RavenDB instance locally or in [RavenDB Cloud](https://cloud.ravendb.net).
 
 ## Components
 

@@ -13,10 +13,8 @@ export enum AggregationView {
   FiveYears = 5,
 }
 
-export interface MarketSymbol {
-  Id: string;
-
-  Symbol: string;
+export class MarketSymbol {
+  constructor(public id: string, public Symbol: string) {}
 }
 
 export interface MarketSymbolViewModel {
@@ -50,7 +48,7 @@ export class SymbolPrice {
   high: number;
   low: number;
 
-  TIME_SERIES_VALUES: TimeSeriesValue<SymbolPrice> = [
+  static TIME_SERIES_VALUES: TimeSeriesValue<SymbolPrice> = [
     { field: "open", name: "Open" },
     { field: "close", name: "Close" },
     { field: "high", name: "High" },

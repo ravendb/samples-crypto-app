@@ -2,12 +2,8 @@ import { AzureFunction, Context, HttpRequest } from "@azure/functions";
 import * as dayjs from "dayjs";
 import * as utc from "dayjs/plugin/utc";
 import * as timezone from "dayjs/plugin/timezone";
-import {
-  IDocumentSession,
-  ITimeSeriesQueryBuilder,
-  TimeSeriesAggregationResult,
-} from "ravendb";
-import { openSession } from "./db";
+import { IDocumentSession, TimeSeriesAggregationResult } from "ravendb";
+import { initializeDb, openDbSession } from "./db";
 import {
   AggregationView,
   MarketSymbol,
@@ -16,8 +12,6 @@ import {
   MarketTime,
   SymbolPrice,
 } from "./models";
-
-const MAX_DATE = new Date(8640000000000000);
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -32,7 +26,9 @@ const httpTrigger: AzureFunction = async function (
 
   context.log("Loading market data for:", marketSymbol);
 
-  const session = openSession();
+  await initializeDb();
+
+  const session = openDbSession();
   try {
     const viewModel = await getMarketSymbolData(marketSymbol, view, session);
 
@@ -82,9 +78,9 @@ async function getMarketSymbolData(
   }
 
   const viewModel: MarketSymbolViewModel = {
-    id: symbol.Id,
+    id: symbol.id,
     symbol: symbol.Symbol,
-    aggregation,
+    aggregation: AggregationView[aggregation] as unknown as AggregationView,
     lastPrice: 0,
     changePrice: 0,
     isPreMarket: false,
@@ -96,14 +92,14 @@ async function getMarketSymbolData(
     "history",
     SymbolPrice
   );
-  const latestEntries = await historyTimeSeries.get(
-    dayjs().utc().subtract(1, "day").toDate(),
-    dayjs().utc().toDate()
-  );
+  const fromDate = dayjs().utc().subtract(1, "day").toDate();
+  const toDate = dayjs().utc().toDate();
+
+  const latestEntries = await historyTimeSeries.get(fromDate, toDate);
   const latestEntry = latestEntries.pop();
 
   viewModel.lastUpdated = latestEntry?.timestamp;
-  viewModel.lastPrice = latestEntry?.value?.close;
+  viewModel.lastPrice = latestEntry?.value?.close ?? 0;
 
   viewModel.history = await getSymbolAggregationBuckets(
     marketSymbol,
@@ -153,23 +149,23 @@ async function getSymbolAggregationBuckets(
   const fromDate = fromDates[aggregation];
 
   const symbolId = `MarketSymbols/${marketSymbol}`;
-  const SymbolProjection = class extends TimeSeriesAggregationResult {};
 
   const aggregatedHistoryQueryResult = await session
-    .query({
-      collection: "MarketSymbol",
-    })
-    .whereEquals("Id", symbolId)
+    .query(MarketSymbol)
+    .whereEquals("id", symbolId)
     .selectTimeSeries(
       (builder) =>
         builder.raw(
           `from history 
-          between '${fromDate.toISOString()}' and '${MAX_DATE.toISOString()}' 
-          group by '${groupingAction}' 
+          between $start and $end 
+          group by $groupBy
           select first(), last(), min(), max()`
         ),
-      SymbolProjection
+      TimeSeriesAggregationResult
     )
+    .addParameter("start", fromDate)
+    .addParameter("end", dayjs.utc().toDate())
+    .addParameter("groupBy", groupingAction)
     .firstOrNull();
 
   if (!aggregatedHistoryQueryResult) {
@@ -178,15 +174,15 @@ async function getSymbolAggregationBuckets(
 
   const historyBuckets: MarketSymbolTimeBucket[] = [];
   aggregatedHistoryQueryResult.results.forEach((seriesAggregation) => {
-    const symbolPrice =
-      seriesAggregation.asTypedEntry<SymbolPrice>(SymbolPrice);
+    // TODO: See https://github.com/ravendb/ravendb-nodejs-client/issues/287
+    // const symbolPrice = seriesAggregation.asTypedEntry(SymbolPrice);
 
     historyBuckets.push({
-      timestamp: symbolPrice.from,
-      openingPrice: symbolPrice.first.open,
-      closingPrice: symbolPrice.last.close,
-      highestPrice: symbolPrice.max.high,
-      lowestPrice: symbolPrice.min.low,
+      timestamp: seriesAggregation.from,
+      openingPrice: seriesAggregation.first[0],
+      closingPrice: seriesAggregation.last[1],
+      highestPrice: seriesAggregation.max[2],
+      lowestPrice: seriesAggregation.min[3],
     });
   });
 

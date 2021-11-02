@@ -30,9 +30,14 @@ To run locally, you will need a `local.settings.json` file like this:
     "DB_NAME": "data",
     "DB_CERT_PATH": "./db.pfx",
     "DB_PASSWORD": "<password>"
+  },
+  "Host": {
+    "CORS": "*"
   }
 }
 ```
+
+> Note: The `Host.CORS` section is required to access the URL from http://localhost URLs
 
 ### For more information
 

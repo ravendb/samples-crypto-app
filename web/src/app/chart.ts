@@ -3,7 +3,7 @@ import dayjs from "dayjs";
 import { formatCurrency } from "./helpers";
 import { resetPointInTimeState, updatePointInTimeState } from "./state";
 
-var chartOptions = {
+const chartOptions = {
   chart: {
     type: "line",
     events: {
@@ -100,7 +100,7 @@ const chart = new ApexCharts(
 );
 chart.render();
 
-function onChartMutation(mutations: MutationRecord[]) {
+function resetPriceStateOnMutation(mutations: MutationRecord[]) {
   const markers = mutations.filter((mut) =>
     (mut.target as HTMLElement).classList.contains("apexcharts-marker")
   );
@@ -114,7 +114,7 @@ function onChartMutation(mutations: MutationRecord[]) {
   }
 }
 
-var observer = new MutationObserver(onChartMutation);
+const observer = new MutationObserver(resetPriceStateOnMutation);
 observer.observe(document.querySelector(".crypto-chart"), {
   subtree: true,
   attributes: true,

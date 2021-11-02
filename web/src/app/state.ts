@@ -5,7 +5,7 @@ import { formatCurrency } from "./helpers";
 import { store } from "./store";
 import { MarketSymbolTimeBucket } from "./types";
 
-const Page = {
+const Ui = {
   get symbol() {
     return document.getElementById("crypto-symbol");
   },
@@ -36,7 +36,7 @@ const Page = {
   },
 };
 
-export default function updateUi() {
+function getCryptoApiData() {
   const state = store.getState();
 
   if (!tickerDataSelector) return;
@@ -45,28 +45,22 @@ export default function updateUi() {
 
   if (error) {
     console.error(error);
+    return null;
   }
 
-  if (!data) return;
-
-  Page.symbol.innerText = data.symbol;
-
-  updateChangeSummaryState(data.lastPrice, data.changePrice);
-  updateAggregationButtonState(data.aggregation);
-  updateChartState(data.history, data.aggregation);
-  updateUrlState(data.aggregation, data.symbol);
+  return data;
 }
 
-function updateAggregationButtonState(aggregation: string) {
-  Page.aggregationButtons.forEach((btn) => {
-    delete btn.dataset.selected;
-  });
+export default function updateUi() {
+  const data = getCryptoApiData();
+  if (!data) return;
 
-  const aggregateByButton = Page.aggregationButton(aggregation);
+  Ui.symbol.innerText = data.symbol;
 
-  aggregateByButton.dataset.selected = "true";
-  Page.changeTimespanDisplay.innerText =
-    aggregateByButton.dataset.aggregateByText;
+  updateUrlState(data.aggregation, data.symbol);
+  updatePriceState(data.lastPrice, data.changePrice);
+  updateAggregationState(data.aggregation);
+  updateChartState(data.history, data.aggregation);
 }
 
 function updateUrlState(aggregation: string, symbol: string) {
@@ -77,6 +71,38 @@ function updateUrlState(aggregation: string, symbol: string) {
       "/?view=" + aggregation
     );
   }
+}
+
+function updatePriceState(lastPrice: number, changePrice: number) {
+  Ui.price.innerText = lastPrice.toFixed(2);
+
+  if (lastPrice === 0) {
+    lastPrice = 1;
+  }
+
+  Ui.changePercentage.innerText =
+    ((changePrice / lastPrice) * 100).toFixed(2) + "%";
+
+  if (changePrice > 0) {
+    Ui.changePrice.innerText = `+${formatCurrency(changePrice)}`;
+  } else {
+    Ui.changePrice.innerText = formatCurrency(changePrice);
+  }
+
+  Ui.changeSummary.dataset.changeType =
+    changePrice > 0 ? "positive" : changePrice === 0 ? "none" : "negative";
+}
+
+function updateAggregationState(aggregation: string) {
+  Ui.aggregationButtons.forEach((btn) => {
+    delete btn.dataset.selected;
+  });
+
+  const aggregateByButton = Ui.aggregationButton(aggregation);
+
+  aggregateByButton.dataset.selected = "true";
+  Ui.changeTimespanDisplay.innerText =
+    aggregateByButton.dataset.aggregateByText;
 }
 
 function updateChartState(
@@ -106,28 +132,8 @@ function updateChartState(
   }
 }
 
-function updateChangeSummaryState(lastPrice: number, changePrice: number) {
-  Page.price.innerText = lastPrice.toFixed(2);
-
-  if (lastPrice === 0) {
-    lastPrice = 1;
-  }
-
-  Page.changePercentage.innerText =
-    ((changePrice / lastPrice) * 100).toFixed(2) + "%";
-
-  if (changePrice > 0) {
-    Page.changePrice.innerText = `+${formatCurrency(changePrice)}`;
-  } else {
-    Page.changePrice.innerText = formatCurrency(changePrice);
-  }
-
-  Page.changeSummary.dataset.changeType =
-    changePrice > 0 ? "positive" : changePrice === 0 ? "none" : "negative";
-}
-
 export function setupAggregationButtonListeners() {
-  Page.aggregationButtons.forEach((button) => {
+  Ui.aggregationButtons.forEach((button) => {
     button.addEventListener("click", (e) => {
       const aggregation = (e.target as HTMLElement).dataset.aggregateBy;
 
@@ -145,32 +151,25 @@ export function setupAggregationButtonListeners() {
 }
 
 export function resetPointInTimeState() {
-  const state = store.getState();
-
-  if (!tickerDataSelector) return;
-
-  const { data } = tickerDataSelector(state);
-
+  const data = getCryptoApiData();
   if (!data) return;
 
-  updateChangeSummaryState(data.lastPrice, data.changePrice);
+  updatePriceState(data.lastPrice, data.changePrice);
 
-  const aggregateByButton = Page.aggregationButton(data.aggregation);
+  const aggregateByButton = Ui.aggregationButton(data.aggregation);
 
-  Page.changeTimespanDisplay.innerText =
+  Ui.changeTimespanDisplay.innerText =
     aggregateByButton.dataset.aggregateByText;
 }
 
 export function updatePointInTimeState(timestamp: string, amount: number) {
-  const state = store.getState();
-  const { data } = tickerDataSelector(state);
-
+  const data = getCryptoApiData();
   if (!data) return;
 
   const changePrice = amount - data.lastPrice;
 
-  updateChangeSummaryState(data.lastPrice, changePrice);
+  updatePriceState(data.lastPrice, changePrice);
 
-  Page.changeTimespanDisplay.innerText =
+  Ui.changeTimespanDisplay.innerText =
     dayjs(timestamp).format("hh:mm A MMM DD");
 }

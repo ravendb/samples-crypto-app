@@ -8,6 +8,8 @@ An end-to-end sample application that showcases Time Series support in RavenDB t
 
 You can watch a [quick 5 minute overview](https://www.youtube.com/watch?v=yF-ReWqVaqU) of the Time Series feature in RavenDB and what it enables.
 
+There's also [an in-depth walkthrough](https://ravendb.net/articles/working-with-market-data-using-time-series-in-ravendb) of how this code was built that introduces you to the different parts of the Time Series API.
+
 ## Live Demo
 
 https://ravendb-samples-crypto-app.netlify.com

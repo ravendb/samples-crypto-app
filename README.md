@@ -6,8 +6,6 @@ An end-to-end sample application that showcases Time Series support in RavenDB t
 
 ## Time Series Feature Showcase
 
-<iframe width="560" height="315" src="https://www.youtube.com/embed/yF-ReWqVaqU" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-
 You can watch a [quick 5 minute overview](https://www.youtube.com/watch?v=yF-ReWqVaqU) of the Time Series feature in RavenDB and what it enables.
 
 ## Live Demo

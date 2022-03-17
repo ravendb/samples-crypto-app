@@ -8,7 +8,11 @@ You will need your RavenDB certificate PFX file (`db.pfx`) and the following env
 DB_URL=<url to your ravendb host>
 DB_NAME=<database name>
 DB_PASSWORD=<database password>
+DB_CERT_THUMBPRINT=<certificate thumbprint>
 ```
+
+RavenDB client certificate needs to be installed in the OS certificate store and is loaded by thumbprint.
+On Azure an environment variable WEBSITE_LOAD_CERTIFICATES="<cert thumbprint>" is required to be set. This allows the certificate by the given thumbprint to be loaded in the Azure Function application.
 
 These can be provided via the `local.settings.json` file _or_ through environment variables.
 

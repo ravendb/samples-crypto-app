@@ -12,7 +12,7 @@ There's also [an in-depth walkthrough](https://ravendb.net/articles/working-with
 
 ## Live Demo
 
-https://ravendb-samples-crypto-app.netlify.com
+https://crypto.samples.ravendb.net
 
 ## Database Exports
 
@@ -20,7 +20,7 @@ You can download sample exports of the RavenDB database [here](exports) that you
 
 ## Components
 
-- **web** - A static HTML & TypeScript website front-end to display the crypto chart deployed through [Netlify](https://netlify.com).
+- **web** - A static HTML & TypeScript website front-end to display the crypto chart deployed through [AWS S3 Website Hosting](https://docs.aws.amazon.com/AmazonS3/latest/userguide/WebsiteHosting.html).
 - **functions/ingestion-\*** - Node.js and .NET 5 C# [Azure functions](https://www.azure.com) that ingest BTC-USDT symbol data from Kucoin every 35 minutes.
 - **functions/backend-\*** - Node.js and .NET 5 C# [Azure functions](https://www.azure.com) that host the HTTP endpoint to return aggregations and crypto symbol data.
 

@@ -90,7 +90,8 @@ namespace Raven.Demos.CryptoApp
 
 				foreach (var bucket in buckets)
 				{
-					historyTimeSeries.Append(bucket.Timestamp, new SymbolPrice()
+					var date = DateTimeOffset.FromUnixTimeSeconds(bucket.Timestamp).UtcDateTime;
+					historyTimeSeries.Append(date, new SymbolPrice()
 					{
 						Open = bucket.OpenPrice,
 						Close = bucket.ClosePrice,

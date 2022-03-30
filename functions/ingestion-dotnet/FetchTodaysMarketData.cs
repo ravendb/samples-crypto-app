@@ -10,109 +10,115 @@ using Raven.Demos.CryptoApp.Models;
 
 namespace Raven.Demos.CryptoApp
 {
-  public static class FetchTodaysMarketData
-  {
-    const string SYMBOL_TO_FETCH = "BTC-USDT";
+	public static class FetchTodaysMarketData
+	{
+		const string SYMBOL_TO_FETCH = "BTC-USDT";
 
-    static DateTimeZone MarketTimeZone = DateTimeZoneProviders.Tzdb.GetZoneOrNull("America/New_York");
+		static DateTimeZone MarketTimeZone = DateTimeZoneProviders.Tzdb.GetZoneOrNull("America/New_York");
 
-    [Function("FetchTodaysMarketDataDotNet")]
-    public static async Task Run([TimerTrigger("0 15/30 * * * *", RunOnStartup = true)] MyInfo myTimer, FunctionContext context)
-    {
-      var logger = context.GetLogger("FetchTodaysMarketDataDotNet");
+		[Function("FetchTodaysMarketDataDotNet")]
+		public static async Task Run([TimerTrigger("0 15/30 * * * *", RunOnStartup = true)] MyInfo myTimer, FunctionContext context)
+		{
+			var logger = context.GetLogger("FetchTodaysMarketDataDotNet");
 
-      logger.LogInformation(
-        $"Fetching today's market data for {SYMBOL_TO_FETCH} at {DateTime.Now}"
-      );
-      logger.LogInformation($"Next timer schedule at: {myTimer.ScheduleStatus.Next}");
+			logger.LogInformation(
+			  $"Fetching today's market data for {SYMBOL_TO_FETCH} at {DateTime.Now}"
+			);
+			logger.LogInformation($"Next timer schedule at: {myTimer.ScheduleStatus.Next}");
 
-      var now = SystemClock.Instance.GetCurrentInstant();
-      var today = now.InZone(MarketTimeZone).Date;
+			var now = SystemClock.Instance.GetCurrentInstant();
+			var today = now.InZone(MarketTimeZone).Date;
 
-      var startOfDay = MarketTimeZone.AtStartOfDay(today).ToInstant().ToUnixTimeSeconds();
-      var endOfDay = MarketTimeZone.AtStartOfDay(today.PlusDays(1)).ToInstant().ToUnixTimeSeconds();
+			var startOfDay = MarketTimeZone.AtStartOfDay(today).ToInstant().ToUnixTimeSeconds();
+			var endOfDay = MarketTimeZone.AtStartOfDay(today.PlusDays(1)).ToInstant().ToUnixTimeSeconds();
 
-      var buckets = await FetchMarketSymbolCandleBucketsAsync(
-        SYMBOL_TO_FETCH,
-        startOfDay,
-        endOfDay,
-        context
-      );
+			var buckets = await FetchMarketSymbolCandleBucketsAsync(
+			  SYMBOL_TO_FETCH,
+			  startOfDay,
+			  endOfDay,
+			  context
+			);
 
-      await SaveMarketSymbolBuckets(SYMBOL_TO_FETCH, buckets, context);
+			await SaveMarketSymbolBuckets(SYMBOL_TO_FETCH, buckets, context);
 
-      logger.LogInformation($"Successfully saved entries to MarketSymbols/{SYMBOL_TO_FETCH}");
-    }
+			logger.LogInformation($"Successfully saved entries to MarketSymbols/{SYMBOL_TO_FETCH}");
+		}
 
-    private static async Task<KucoinMarketCandleBucket[]> FetchMarketSymbolCandleBucketsAsync(string symbol, long startUnixTime, long endUnixTime, FunctionContext context)
-    {
-      var kucoinApi = context.InstanceServices.GetService<IKucoinApi>();
-      var res = await kucoinApi.GetMarketCandles(symbol, "1min", startUnixTime, endUnixTime);
+		private static async Task<KucoinMarketCandleBucket[]> FetchMarketSymbolCandleBucketsAsync(string symbol, long startUnixTime, long endUnixTime, FunctionContext context)
+		{
+			var kucoinApi = context.InstanceServices.GetService<IKucoinApi>();
+			var res = await kucoinApi.GetMarketCandles(symbol, "1min", startUnixTime, endUnixTime);
 
-      if (res.Data != null)
-      {
-        return res.Data.Select(bucket =>
-        {
-          return new KucoinMarketCandleBucket()
-          {
-            Timestamp = long.Parse(bucket[0]),
-            OpenPrice = double.Parse(bucket[1]),
-            ClosePrice = double.Parse(bucket[2]),
-            HighPrice = double.Parse(bucket[3]),
-            LowPrice = double.Parse(bucket[4])
-          };
-        }).ToArray();
-      }
-      else
-      {
-        return new KucoinMarketCandleBucket[] { };
-      }
-    }
+			if (res.Data != null)
+			{
+				return res.Data.Select(bucket =>
+				{
+					return new KucoinMarketCandleBucket()
+					{
+						Timestamp = long.Parse(bucket[0]),
+						OpenPrice = double.Parse(bucket[1]),
+						ClosePrice = double.Parse(bucket[2]),
+						HighPrice = double.Parse(bucket[3]),
+						LowPrice = double.Parse(bucket[4])
+					};
+				}).ToArray();
+			}
+			else
+			{
+				return new KucoinMarketCandleBucket[] { };
+			}
+		}
 
-    private static async Task SaveMarketSymbolBuckets(string symbol, KucoinMarketCandleBucket[] buckets, FunctionContext context)
-    {
-      var session = context.InstanceServices.GetService<IAsyncDocumentSession>();
-      var symbolDoc = await session.LoadAsync<MarketSymbol>($"MarketSymbols/{symbol}");
+		private static async Task SaveMarketSymbolBuckets(string symbol, KucoinMarketCandleBucket[] buckets, FunctionContext context)
+		{
+			using (var session = context.InstanceServices.GetService<IAsyncDocumentSession>())
+			{
+				var id = $"MarketSymbols/{symbol}";
+				var symbolDoc = await session.LoadAsync<MarketSymbol>(id);
 
-      if (symbolDoc == null)
-      {
-        symbolDoc = new MarketSymbol()
-        {
-          Symbol = symbol
-        };
-      }
+				if (symbolDoc == null)
+				{
+					symbolDoc = new MarketSymbol()
+					{
+						Symbol = symbol
+					};
 
-      var historyTimeSeries = session.TimeSeriesFor<SymbolPrice>(symbolDoc, "history");
+					await session.StoreAsync(symbolDoc, null, id);
+				}
 
-      foreach (var bucket in buckets)
-      {
-        historyTimeSeries.Append(DateTime.UtcNow, new SymbolPrice()
-        {
-          Open = bucket.OpenPrice,
-          Close = bucket.ClosePrice,
-          High = bucket.HighPrice,
-          Low = bucket.LowPrice
-        });
-      }
+				var historyTimeSeries = session.TimeSeriesFor<SymbolPrice>(symbolDoc, "history");
 
-      await session.StoreAsync(symbolDoc);
-      await session.SaveChangesAsync();
-    }
-  }
+				foreach (var bucket in buckets)
+				{
+					var date = DateTimeOffset.FromUnixTimeSeconds(bucket.Timestamp).UtcDateTime;
+					historyTimeSeries.Append(date, new SymbolPrice()
+					{
+						Open = bucket.OpenPrice,
+						Close = bucket.ClosePrice,
+						High = bucket.HighPrice,
+						Low = bucket.LowPrice
+					});
+				}
 
-  public class MyInfo
-  {
-    public MyScheduleStatus ScheduleStatus { get; set; }
+				await session.StoreAsync(symbolDoc);
+				await session.SaveChangesAsync();
+			}
+		}
+	}
 
-    public bool IsPastDue { get; set; }
-  }
+	public class MyInfo
+	{
+		public MyScheduleStatus ScheduleStatus { get; set; }
 
-  public class MyScheduleStatus
-  {
-    public DateTime Last { get; set; }
+		public bool IsPastDue { get; set; }
+	}
 
-    public DateTime Next { get; set; }
+	public class MyScheduleStatus
+	{
+		public DateTime Last { get; set; }
 
-    public DateTime LastUpdated { get; set; }
-  }
+		public DateTime Next { get; set; }
+
+		public DateTime LastUpdated { get; set; }
+	}
 }

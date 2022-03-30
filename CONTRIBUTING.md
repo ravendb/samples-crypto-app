@@ -24,20 +24,9 @@ The data is kept for 1 year in a [RavenDB Cloud](https://cloud.ravendb.net) data
 
 ### Netlify
 
-`web` is deployed through [Netlify](https://netlify.com). All configuration is managed through the Netlify UI (currently).
+`web` is deployed is deployed statically on [AWS S3 Website Hosting](https://docs.aws.amazon.com/AmazonS3/latest/userguide/WebsiteHosting.html).
 
-The hosted URL is at https://ravendb-samples-crypto-app.netlify.com
-
-You can use Netlify to host a fork of this repository:
-
-1. [Sign up](https://app.netlify.com/) for an account (it's free)
-1. [Set up Netlify](https://app.netlify.com/start) for your Git repository
-1. Set the `Base directory` to `web`
-1. Set the `Build command` to `npm run build`
-1. Set the `Publish directory` to `web/build`
-1. That's it! 
-
-Netlify will automatically deploy whenever a commit is pushed to the `main` branch.
+The hosted URL is at https://crypto.samples.ravendb.net
 
 #### Build Minutes
 
@@ -65,9 +54,11 @@ For how to find your Az Function's outbound IPs, see: https://docs.microsoft.com
 
 #### Configuring RavenDB Certificates (.pfx)
 
-You will need a `db.pfx` file in the root of each Function folder to connect to your RavenDB instance. It should have a password (provided in `local.settings.json` file.)
+You will need to add RavenDB client certificate through Azure portal.
 
-The `.pfx` file is **included** in the project to be deployed to Az Functions (but **ignored** in Git). The most secure way is to leverage Azure Key Vault or even to upload via the portal and read from the `CurrentUser/My` store if possible vs. uploading the PFX.
+In the Azure portal on you Azure Function management page from the left navigation of your app, select TLS/SSL settings, then select Private Key Certificates (.pfx).
+
+Add your client certificate and make a note of the certificate thumbprint.
 
 See: https://jan-v.nl/post/loading-certificates-with-azure-functions/
 
@@ -77,6 +68,8 @@ It's recommended to create a least-privilege User-level client certificate [usin
 - `backend` only requires **Read** access to the database
 
 Both Azure Function deployments should use separately scoped certificates with different passphrases.
+
+Additionally in order for the Azure Function application to be able to load the certificate, `WEBSITE_LOAD_CERTIFICATES` environment variable needs to be set to the thumbprint of the client certificate.
 
 #### Specifying Backend URL
 

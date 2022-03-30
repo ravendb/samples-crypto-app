@@ -1,6 +1,6 @@
 # Web Frontend
 
-This web frontend is deployed statically to Netlify at https://ravendb-stock-demo.netlify.app
+This web frontend is deployed statically on [AWS S3 Website Hosting](https://docs.aws.amazon.com/AmazonS3/latest/userguide/WebsiteHosting.html).
 
 ## Running Locally
 

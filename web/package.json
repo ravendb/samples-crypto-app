@@ -6,7 +6,9 @@
   "scripts": {
     "start": "cross-env SNOWPACK_PUBLIC_BACKEND_URL=https://ravendb-stock-demo-backend.azurewebsites.net/api snowpack dev",
     "start:local": "cross-env SNOWPACK_PUBLIC_BACKEND_URL=http://localhost:7071/api snowpack dev",
-    "build": "cross-env SNOWPACK_PUBLIC_BACKEND_URL=https://ravendb-stock-demo-backend.azurewebsites.net/api snowpack build"
+    "build": "cross-env SNOWPACK_PUBLIC_BACKEND_URL=https://ravendb-stock-demo-backend.azurewebsites.net/api snowpack build",
+    "start:custom": "cross-env snowpack dev",
+    "build:custom": "cross-env snowpack build"
   },
   "author": "",
   "license": "ISC",
